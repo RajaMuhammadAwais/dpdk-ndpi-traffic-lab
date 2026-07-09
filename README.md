@@ -1,6 +1,6 @@
 # DPDK + nDPI Real-Time Network Traffic Analysis Lab
 
-![License](https://img.shields.io/github/license/manus-ai/dpdk-ndpi-traffic-lab)
+![License](https://img.shields.io/github/license/RajaMuhammadAwais/dpdk-ndpi-traffic-lab)
 ![C](https://img.shields.io/badge/language-C-blue.svg)
 ![DPDK](https://img.shields.io/badge/DPDK-v23.11-orange)
 ![nDPI](https://img.shields.io/badge/nDPI-latest-green)
@@ -27,7 +27,7 @@ This lab demonstrates how to:
 We provide an automated setup script that handles all dependencies, clones the necessary repositories, and builds the libraries.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/dpdk-ndpi-traffic-lab.git
+git clone https://github.com/RajaMuhammadAwais/dpdk-ndpi-traffic-lab.git
 cd dpdk-ndpi-traffic-lab
 sudo chmod +x setup.sh
 sudo ./setup.sh
