@@ -54,8 +54,16 @@ sudo ./main -l 0 --vdev=net_pcap0,iface=eth0 --no-huge --file-prefix=lab1
 
 - `main.c`: Core application logic (DPDK initialization & nDPI integration).
 - `setup.sh`: Automated environment configuration script.
+- `RESEARCH.md`: Deep dive into latest advancements (2024-2026) and contribution roadmap.
 - `Makefile`: Optimized build configuration using `pkg-config`.
 - `DPDK + nDPI...md`: Comprehensive educational guide.
+
+## 🔬 Research & Contributions
+
+This project is actively updated with the latest research in high-performance networking. See [RESEARCH.md](./RESEARCH.md) for details on:
+- **nDPI 5.0** Unified Fingerprinting.
+- **DPDK 24.11/25.11** Hardware Flow Offloading.
+- Advanced Flow Tracking with Cuckoo Hashing.
 
 ## 🤝 Contributing
 
