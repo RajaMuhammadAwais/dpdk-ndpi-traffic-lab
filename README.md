@@ -64,6 +64,7 @@ This project is actively updated with the latest research in high-performance ne
 - **nDPI 5.0** Unified Fingerprinting.
 - **High-Performance Flow Table**: Implemented using DPDK's `rte_hash` (Cuckoo Hash) for efficient stateful packet processing.
 - **DPDK 24.11/25.11** Hardware Flow Offloading.
+- **Performance Analysis**: See [PERFORMANCE.md](./PERFORMANCE.md) for a detailed analysis of the Cuckoo Hash implementation.
 - Advanced Flow Tracking with Cuckoo Hashing.
 
 ## 🤝 Contributing
