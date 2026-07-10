@@ -1,74 +1,56 @@
 #!/bin/bash
 
-# ==============================================================================
-# DPDK + nDPI Lab Setup Script
-# Description: Automated installation of DPDK and nDPI for network analysis.
-# Author: Open Source Contributor
-# License: MIT
-# ==============================================================================
-
+# Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+echo "Starting DPDK + nDPI Lab Setup Script"
 
-log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
-
-# Check for root privileges
-if [[ $EUID -ne 0 ]]; then
-   log_error "This script must be run as root (use sudo)"
-   exit 1
-fi
-
-# Configuration
-DPDK_VERSION="v23.11"
-INSTALL_DIR="/opt/dpdk_ndpi_lab"
-mkdir -p "$INSTALL_DIR"
-
-log_info "Starting environment preparation..."
-apt update
-apt install -y build-essential meson ninja-build pkg-config \
+# 1. Environment Preparation
+echo "1. Installing build dependencies..."
+sudo apt update
+sudo apt install -y build-essential meson ninja-build pkg-config \
     libnuma-dev python3-pyelftools libpcap-dev libtool \
     autoconf automake git
 
-# 1. DPDK Installation
-log_info "Installing DPDK ${DPDK_VERSION}..."
-cd "$INSTALL_DIR"
-if [ ! -d "dpdk" ]; then
-    git clone --depth 1 --branch "$DPDK_VERSION" https://github.com/DPDK/dpdk.git
+# 2. DPDK Installation (v23.11)
+echo "2. Installing DPDK v23.11..."
+DPDK_DIR="/home/ubuntu/dpdk"
+if [ -d "$DPDK_DIR" ]; then
+    echo "DPDK directory already exists. Removing and re-cloning."
+    sudo rm -rf "$DPDK_DIR"
 fi
-cd dpdk
+git clone --depth 1 --branch v23.11 https://github.com/DPDK/dpdk.git "$DPDK_DIR"
+cd "$DPDK_DIR"
 meson setup build
 ninja -C build
-ninja -C build install
-ldconfig
+sudo ninja -C build install
+sudo ldconfig
 
-# 2. nDPI Installation
-log_info "Installing nDPI (latest)..."
-cd "$INSTALL_DIR"
-if [ ! -d "ndpi" ]; then
-    git clone https://github.com/ntop/nDPI.git
+# Create symlink for nDPI build if needed (old nDPI Makefiles might look for it)
+if [ ! -L "/home/ubuntu/DPDK" ]; then
+    echo "Creating DPDK symlink for nDPI compatibility."
+    ln -s "$DPDK_DIR" /home/ubuntu/DPDK
 fi
-cd ndpi
+
+# 3. nDPI Installation
+echo "3. Installing nDPI..."
+NDPI_DIR="/home/ubuntu/ndpi"
+if [ -d "$NDPI_DIR" ]; then
+    echo "nDPI directory already exists. Removing and re-cloning."
+    sudo rm -rf "$NDPI_DIR"
+fi
+git clone https://github.com/ntop/nDPI.git "$NDPI_DIR"
+cd "$NDPI_DIR"
 ./autogen.sh
 ./configure
-make -j$(nproc)
-make install
-ldconfig
+make
+sudo make install
+sudo ldconfig
 
-# 3. Build Lab Application
-log_info "Compiling the Lab Application..."
-# Navigate to the script's directory (assuming repo files are here)
-REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$REPO_DIR"
-make clean || true
+# 4. Compile the Lab Application
+echo "4. Compiling the DPDK + nDPI lab application..."
+cd /home/ubuntu/dpdk_ndpi_lab
 make
 
-log_info "Setup Complete!"
-log_info "To run the application:"
-echo -e "${YELLOW}sudo ./main -l 0 --vdev=net_pcap0,iface=eth0 --no-huge --file-prefix=lab1${NC}"
+echo "Setup complete! You can now run the application from /home/ubuntu/dpdk_ndpi_lab/main"
+echo "Example usage: sudo ./main -l 0 --vdev=net_pcap0,iface=eth0 --no-huge --file-prefix=lab1"
