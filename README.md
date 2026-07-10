@@ -65,9 +65,7 @@ This project is actively updated with the latest research in high-performance ne
 - **High-Performance Flow Table**: Implemented using DPDK's `rte_hash` (Cuckoo Hash) for efficient stateful packet processing.
 - **DPDK 24.11/25.11** Hardware Flow Offloading.
 - **Performance Analysis**: See [PERFORMANCE.md](./PERFORMANCE.md) for a detailed analysis of the Cuckoo Hash implementation.
-- **Deep Dive Article**: Read our comprehensive article, [From Bottleneck to Breakthrough](./ARTICLE.md), for the full story behind this implementation.
-- **LinkedIn Strategy**: Check [HASHTAGS.md](./HASHTAGS.md) for optimized hashtags to share this work.
-- Advanced Flow Tracking with Cuckoo Hashing.
+
 
 ## 🤝 Contributing
 
