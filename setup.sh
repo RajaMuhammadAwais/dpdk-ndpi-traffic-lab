@@ -9,7 +9,6 @@
 
 set -ex
 
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -56,8 +55,12 @@ log_info "Installing nDPI (latest)..."
 cd "$INSTALL_DIR"
 log_info "Checking for existing nDPI directory..."
 if [ -d "ndpi" ]; then
-    log_warn "nDPI directory already exists. Removing and re-cloning."
+    log_warn "ndpi directory already exists. Removing and re-cloning."
     sudo rm -rf "ndpi"
+fi
+if [ -d "nDPI" ]; then
+    log_warn "nDPI directory already exists. Removing and re-cloning."
+    sudo rm -rf "nDPI"
 fi
 log_info "Cloning nDPI repository..."
 git clone https://github.com/ntop/nDPI.git
