@@ -62,6 +62,7 @@ sudo ./main -l 0 --vdev=net_pcap0,iface=eth0 --no-huge --file-prefix=lab1
 
 This project is actively updated with the latest research in high-performance networking. See [RESEARCH.md](./RESEARCH.md) for details on:
 - **nDPI 5.0** Unified Fingerprinting.
+- **High-Performance Flow Table**: Implemented using DPDK's `rte_hash` (Cuckoo Hash) for efficient stateful packet processing.
 - **DPDK 24.11/25.11** Hardware Flow Offloading.
 - Advanced Flow Tracking with Cuckoo Hashing.
 

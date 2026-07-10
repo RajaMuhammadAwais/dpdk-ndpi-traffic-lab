@@ -13,6 +13,7 @@ Released in late 2025, **nDPI 5.0** introduces a paradigm shift in traffic class
 ### DPDK 24.11/25.11 LTS: Hardware-Accelerated Intelligence
 The latest Long Term Stable (LTS) releases focus on offloading and state management:
 - **rte_flow Offload**: Classification of "elephant flows" (long-lived high-bandwidth flows) can now be offloaded directly to the NIC hardware after initial nDPI identification, reducing CPU overhead by up to 80%.
+- **High-Performance Flow Table**: Implemented using DPDK's `rte_hash` (Cuckoo Hash) for efficient stateful packet processing.
 - **Stateful Cuckoo Hash**: Enhanced `rte_cuckoo_hash` libraries provide O(1) lookup performance for millions of concurrent flows, essential for stateful DPI at 100Gbps+ speeds.
 
 ## 2. Research-Based Contribution Opportunities
@@ -38,7 +39,7 @@ The latest Long Term Stable (LTS) releases focus on offloading and state managem
 |---------|------------|--------------|--------------|
 | Unified Fingerprinting | Medium | 23.11+ | 5.0+ |
 | Hardware Flow Offload | High | 24.11+ | 4.x/5.0 |
-| Cuckoo Hash Flow Table | Medium | 23.11+ | Any |
+| Cuckoo Hash Flow Table | Implemented | 23.11+ | Any |
 | DNS-less SNI Detection | Low | Any | 5.0+ |
 
 ## 4. References & Further Reading
