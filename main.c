@@ -16,8 +16,8 @@
 #include <rte_malloc.h>
 
 #define MAX_FLOWS 65536
-#define FLOW_TIMEOUT_MS 30000 // 30 seconds
-#define CLEANUP_INTERVAL_MS 5000 // 5 seconds
+#define FLOW_TIMEOUT_MS 30000
+#define CLEANUP_INTERVAL_MS 5000
 
 struct flow_key {
     uint32_t ip_src;
@@ -55,20 +55,13 @@ static void cleanup_expired_flows(void) {
     void *next_data;
     uint32_t iter = 0;
     int32_t ret;
-    uint32_t expired_count = 0;
-
     while ((ret = rte_hash_iterate(flow_table, &next_key, &next_data, &iter)) >= 0) {
         struct flow_value *val = (struct flow_value *)next_data;
         if (now - val->last_packet_time_ms > FLOW_TIMEOUT_MS) {
             rte_hash_del_key(flow_table, next_key);
             ndpi_flow_free(val->ndpi_flow);
             rte_free(val);
-            expired_count++;
         }
-    }
-    
-    if (expired_count > 0) {
-        printf("Cleaned up %u expired flows. Total active: %d\n", expired_count, rte_hash_count(flow_table));
     }
     last_cleanup_time_ms = now;
 }
@@ -138,7 +131,6 @@ static void process_packet(struct rte_mbuf *m) {
         key.port_dst = udp_hdr->dst_port;
     }
 
-    // Canonicalize key for bidirectional tracking
     if (key.ip_src > key.ip_dst || (key.ip_src == key.ip_dst && key.port_src > key.port_dst)) {
         uint32_t temp_ip = key.ip_src; key.ip_src = key.ip_dst; key.ip_dst = temp_ip;
         uint16_t temp_port = key.port_src; key.port_src = key.port_dst; key.port_dst = temp_port;
@@ -163,10 +155,23 @@ static void process_packet(struct rte_mbuf *m) {
     ndpi_protocol proto = ndpi_detection_process_packet(ndpi_info_mod, val->ndpi_flow, packet_data, packet_len, now, NULL);
     
     if (proto.proto.master_protocol != 0 || proto.proto.app_protocol != 0) {
-        printf("[%u.%u.%u.%u:%u <-> %u.%u.%u.%u:%u] Protocol: %s\n",
+        printf("[%u.%u.%u.%u:%u <-> %u.%u.%u.%u:%u] Protocol: %s",
                (key.ip_src >> 0) & 0xFF, (key.ip_src >> 8) & 0xFF, (key.ip_src >> 16) & 0xFF, (key.ip_src >> 24) & 0xFF, rte_be_to_cpu_16(key.port_src),
                (key.ip_dst >> 0) & 0xFF, (key.ip_dst >> 8) & 0xFF, (key.ip_dst >> 16) & 0xFF, (key.ip_dst >> 24) & 0xFF, rte_be_to_cpu_16(key.port_dst),
                ndpi_get_proto_name(ndpi_info_mod, proto.proto.app_protocol ? proto.proto.app_protocol : proto.proto.master_protocol));
+        
+        if (val->ndpi_flow->protos.tls_quic.ja4_client[0] != '\0') {
+            printf(" | JA4: %s", val->ndpi_flow->protos.tls_quic.ja4_client);
+        }
+        printf("\n");
+    }
+
+    if (val->ndpi_flow->risk != 0) {
+        for (int i = 0; i < NDPI_MAX_RISK; i++) {
+            if (ndpi_isset_risk(val->ndpi_flow, i)) {
+                printf("  [!] SECURITY ALERT: %s\n", ndpi_risk2str(i));
+            }
+        }
     }
 
     cleanup_expired_flows();
